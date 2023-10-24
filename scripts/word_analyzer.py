@@ -2,11 +2,13 @@
 A script to analyze word frequency of displayable content in HTML files
 """
 import argparse
+import concurrent.futures
 import json
 import re
 import os
 # lxml quirk to explicitly import subpackage
 import lxml.html
+import threading
 from collections import Counter
 from bs4 import BeautifulSoup
 
@@ -16,12 +18,17 @@ import lib.logger as logger
 
 class WordFrequencyProcessor(object):
 
-    def __init__(self, html_files_dir_path, word_bank_file_path=None):
+    def __init__(self, html_files_dir_path, word_bank_file_path=None,
+                 num_threads=constants.MAX_THREADS):
         """Constructor"""
 
         self.counter = Counter()
         self.html_files_dir_path = html_files_dir_path
+        self.num_threads = num_threads
         self.word_bank = []
+        # Create a lock to protect the counter
+        self.counter_lock = threading.Lock()
+        # Handle if word bank file is given
         if word_bank_file_path:
             word_bank_file_path = os.path.join(
                 os.getcwd(), word_bank_file_path)
@@ -108,8 +115,9 @@ class WordFrequencyProcessor(object):
         # Tokenize and clean the text
         words = self.tokenize_and_clean(all_text)
 
-        # Update the words in the counter
-        self.counter.update(words)
+        # Update the words to the counter in a threadsafe way
+        with self.counter_lock:
+            self.counter.update(words)
 
     def process_all_files(self):
         """
@@ -119,17 +127,22 @@ class WordFrequencyProcessor(object):
         # Iterate through the file paths and calculate word frequency
         logger.INFO(f"Processing all files under {self.html_files_dir_path}")
         file_paths = [f for f in os.listdir(self.html_files_dir_path)]
-        for file_name in file_paths:
-            full_path = os.path.join(self.html_files_dir_path, file_name)
-            if not os.path.isfile(full_path):
-                continue
-            if file_name.startswith("NOT_FOUND_"):
-                logger.DEBUG(f"Skipping {full_path}")
-                continue
+        # Create a ThreadPoolExecutor with the specified number of threads
+        with concurrent.futures.ThreadPoolExecutor(max_workers=self.num_threads) as executor:
+            # Download all URLs concurrently and save to files
+            executor.map(self.run_checks_and_process_file, file_paths)
 
-            logger.INFO(f"Handling {full_path}")
-            with open(full_path, "r", encoding="utf-8") as file:
-                self.process_file_content(html_content=file.read())
+    def run_checks_and_process_file(self, file_name):
+        full_path = os.path.join(self.html_files_dir_path, file_name)
+        if not os.path.isfile(full_path):
+            return
+        if file_name.startswith("NOT_FOUND_"):
+            logger.DEBUG(f"Skipping {full_path}")
+            return
+
+        logger.INFO(f"Handling {full_path}")
+        with open(full_path, "r", encoding="utf-8") as file:
+            self.process_file_content(html_content=file.read())
 
     def get_top_words(self, count):
         """
@@ -160,6 +173,10 @@ if __name__ == "__main__":
                         help=f"Count of top words needed. "
                              f"Default: {constants.TOP_WORD_COUNT}",
                              type=int, default=constants.TOP_WORD_COUNT)
+    parser.add_argument("-n", "--num_threads",
+                        help=f"No.of worker threads to use"
+                             f"Default: {constants.MAX_THREADS}",
+                             type=int, default=constants.MAX_THREADS)
     parser.add_argument("-d", "--debug", help="Enable debug messages",
                         required=False, action='store_true')
 
@@ -168,7 +185,8 @@ if __name__ == "__main__":
         logger.setup_logging(log_level="DEBUG")
     html_files_dir_path = os.path.join(
         os.getcwd(), parsed_args.relative_dir_path)
-    analyzer = WordFrequencyProcessor(html_files_dir_path=html_files_dir_path)
+    analyzer = WordFrequencyProcessor(html_files_dir_path=html_files_dir_path,
+                                      num_threads=parsed_args.num_threads)
     analyzer.process_all_files()
     result = analyzer.get_top_words(count=parsed_args.count)
 
