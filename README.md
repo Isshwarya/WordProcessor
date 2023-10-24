@@ -28,13 +28,13 @@ file (data/downloaded_files.zip) that contains HTML page source for all these ur
 The below command starts the container in interactive mode
 
 ```console
->>> docker run -it word_processor:latest
+>>> docker run -it isshwarya/word_processor:latest
 ```
 
-To start in detached mode:
+To start in detached mode and view logs later
 
 ```console
->>> docker run -d word_processor:latest
+>>> docker run -d isshwarya/word_processor:latest
 320c85df517d2247dcd8a9b549ea67392fbe92aae213552e42e1c72f4ad66d42
 >>>
 >>> docker logs -f 320c85df517d2247dcd8a9b549ea67392fbe92aae213552e42e1c72f4ad66d42
@@ -74,7 +74,7 @@ system. Then follow the below steps.
    word frequency for your files.
 
 ```console
->>> docker run -it -v /Users/$USER/WordProcessor/data/downloaded_files:/WordProcessor/data/downloaded_files word_processor:latest
+>>> docker run -it -v /Users/$USER/WordProcessor/data/downloaded_files:/WordProcessor/data/downloaded_files isshwarya/word_processor:latest
 ```
 
 Now the application will use the files from mounted directory instead of using
