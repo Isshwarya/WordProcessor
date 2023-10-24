@@ -12,6 +12,4 @@ ADD ./data/downloaded_files.zip /WordProcessor/data/downloaded_files.zip
 
 RUN pip install -r requirements.txt
 
-RUN unzip /WordProcessor/data/downloaded_files.zip -d /WordProcessor/data/
-
-CMD ["sh", "-c", "export PYTHONPATH=. && python ./scripts/word_analyzer.py"]
+CMD ["sh", "-c", "if [ ! -d ./data/downloaded_files ]; then unzip /WordProcessor/data/downloaded_files.zip -d /WordProcessor/data/; fi && export PYTHONPATH=. && python ./scripts/word_analyzer.py"]

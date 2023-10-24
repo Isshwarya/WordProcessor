@@ -163,3 +163,6 @@ data/downloaded_files/
 data/downloaded_files*
 data/downloaded_files.zip
 
+# For MAC
+.DS_Store
+
