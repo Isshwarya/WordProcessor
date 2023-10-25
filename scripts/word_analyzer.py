@@ -170,9 +170,11 @@ if __name__ == "__main__":
                              f'Default: {constants.RELATIVE_WORD_BANK_FILE_PATH}',
                         type=str, default=constants.RELATIVE_WORD_BANK_FILE_PATH)
     parser.add_argument("-c", "--count",
-                        help=f"Count of top words needed. "
+                        help=f"Count of top words needed. If not specified in the "
+                             "command line, checks for TOP_WORD_COUNT ENV variable. "
                              f"Default: {constants.TOP_WORD_COUNT}",
-                             type=int, default=constants.TOP_WORD_COUNT)
+                             type=int,
+                             default=os.environ.get("TOP_WORD_COUNT", constants.TOP_WORD_COUNT))
     parser.add_argument("-n", "--num_threads",
                         help=f"No.of worker threads to use"
                              f"Default: {constants.MAX_THREADS}",
