@@ -40,7 +40,7 @@ To start in detached mode and view logs later
 >>> docker logs -f 320c85df517d2247dcd8a9b549ea67392fbe92aae213552e42e1c72f4ad66d42
 ```
 
-### 2. Use the docker image with default url list file
+### 2. Use the docker image with custom url list file
 
 To try with some other url list, you first need to download the page source
 for those. You need Python3.8, pip and virtualenv to be already installed in your
@@ -148,6 +148,6 @@ This executes the application on your local machine directly.
 
 ## Assumptions and TODOs
 
-1. Fake user agent support can be added for thr websites that applies request limits based on useragents
+1. Fake user agent support can be added to handle the websites that applies request limits based on different useragents.
 
-2. Only displayable content of the urls is considered for word processing. Suggestions by the web page for further reads or user reviews posted on that page are not considered.
+2. Only displayable content of the urls is considered for word frequency processing. Suggestions by the web page for further reads or user reviews posted on that page are not considered.
