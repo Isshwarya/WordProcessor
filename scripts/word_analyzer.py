@@ -176,7 +176,7 @@ if __name__ == "__main__":
                              type=int,
                              default=os.environ.get("TOP_WORD_COUNT", constants.TOP_WORD_COUNT))
     parser.add_argument("-n", "--num_threads",
-                        help=f"No.of worker threads to use"
+                        help=f"No.of worker threads to use. "
                              f"Default: {constants.MAX_THREADS}",
                              type=int, default=constants.MAX_THREADS)
     parser.add_argument("-d", "--debug", help="Enable debug messages",

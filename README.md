@@ -15,6 +15,64 @@ A valid word will:
    previous rules)
    The output should be pretty json printed to the stdout
 
+## Documentation
+
+### scripts/download_data.py
+
+This is the script that downloads HTML page source for a given set of urls.
+
+```console
+(env) isshwarya@Isshwaryas-MBP WordProcessor % python scripts/download_data.py --help
+usage: download_data.py [-h] [-o SAVE_DIR] [-f URL_LIST_FILE] [-r MAX_RETRIES] [-n NUM_THREADS] [-d]
+
+A script to download HTML source for URLs
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -o SAVE_DIR, --save_dir SAVE_DIR
+                        relative (to the cwd) directory path that should store HTML source files of the urls. Default: data/downloaded_files
+  -f URL_LIST_FILE, --url_list_file URL_LIST_FILE
+                        relative (to the cwd) file path for url list. Default: data/endg-urls
+  -r MAX_RETRIES, --max_retries MAX_RETRIES
+                        Max no.of retries on failures to get a response from the server to fetch URL source content. Default: 5
+  -n NUM_THREADS, --num_threads NUM_THREADS
+                        No.of worker threads to use. Default: 30
+  -d, --debug           Enable debug messages
+(env) isshwarya@Isshwaryas-MBP WordProcessor %
+
+```
+
+### scripts/word_analyzer.py
+
+This is the script that analyzes word frequency from the given set of HTML files.
+
+```console
+(env) isshwarya@Isshwaryas-MBP WordProcessor % python scripts/word_analyzer.py --help
+usage: word_analyzer.py [-h] [-p RELATIVE_DIR_PATH] [-w WORD_BANK_FILE_PATH] [-c COUNT] [-n NUM_THREADS] [-d]
+
+Word frequency processor
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -p RELATIVE_DIR_PATH, --relative_dir_path RELATIVE_DIR_PATH
+                        relative (to the cwd) directory path that contains html files. Default: data/downloaded_files
+  -w WORD_BANK_FILE_PATH, --word_bank_file_path WORD_BANK_FILE_PATH
+                        relative (to the cwd) file path for word bank. Default: data/word_bank.txt
+  -c COUNT, --count COUNT
+                        Count of top words needed. If not specified in the command line, checks for TOP_WORD_COUNT ENV variable. Default: 10
+  -n NUM_THREADS, --num_threads NUM_THREADS
+                        No.of worker threads to use. Default: 30
+  -d, --debug           Enable debug messages
+(env) isshwarya@Isshwaryas-MBP WordProcessor %
+
+```
+
+Logs for each execution can be found under
+
+```console
+<workspace>/logs/<timestamp_dir>/run.log
+```
+
 ## Solution details
 
 There are three possible ways to use the application.
@@ -38,6 +96,7 @@ To start in detached mode and view logs later
 320c85df517d2247dcd8a9b549ea67392fbe92aae213552e42e1c72f4ad66d42
 >>>
 >>> docker logs -f 320c85df517d2247dcd8a9b549ea67392fbe92aae213552e42e1c72f4ad66d42
+<view console logs>
 ```
 
 ### 2. Use the docker image with custom url list file
@@ -54,12 +113,12 @@ system. Then follow the below steps.
 >>> source ./env/bin/activate
 ```
 
-2. Download or make the url list file available at data/endg-urls
+2. Download or make the url list file available at \<workspace\>/data/endg-urls
 
 3. Then run the script that downloads HTML page source for all those urls.
 
 ```console
->>> export PYTHONPATH=. && python scripts/download_data.py
+>>> cd <workspace> && export PYTHONPATH=. && python scripts/download_data.py
 ```
 
     Note: Depending on the no.of urls to be fetched and the request limit
@@ -74,7 +133,7 @@ system. Then follow the below steps.
    word frequency for your files.
 
 ```console
->>> docker run -it -v /Users/$USER/WordProcessor/data/downloaded_files:/WordProcessor/data/downloaded_files isshwarya/word_processor:latest
+>>> docker run -it -v <workspace>/data/downloaded_files:/WordProcessor/data/downloaded_files isshwarya/word_processor:latest
 ```
 
 Now the application will use the files from mounted directory instead of using

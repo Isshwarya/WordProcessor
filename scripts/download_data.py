@@ -157,7 +157,7 @@ if __name__ == "__main__":
                              f"Default: {constants.MAX_RETRIES_TO_GET_URL_CONTENT}",
                              type=int, default=constants.MAX_RETRIES_TO_GET_URL_CONTENT)
     parser.add_argument("-n", "--num_threads",
-                        help=f"No.of worker threads to use"
+                        help=f"No.of worker threads to use. "
                              f"Default: {constants.MAX_THREADS}",
                              type=int, default=constants.MAX_THREADS)
     parser.add_argument("-d", "--debug", help="Enable debug messages",
